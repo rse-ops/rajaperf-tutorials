@@ -1,0 +1,13 @@
+title: "RAJAPerf Tutorial (under development)"
+container:
+  name: ghcr.io/rse-ops/rajaperf-tutorial:basic
+  env:
+    - name: password
+      optional: true
+  ports:
+    - 443:443
+project:
+  github: LLNL/RAJAPerf
+notebooks:
+  - name: 01-radiuss-aws-flux.ipynb
+    title: Flux Jobs Tutorial
