@@ -21,7 +21,6 @@ jobs:
         root: tutorials
 
   build:
-    if: ${{ needs.generate.outputs.is_empty == 'false' }}
     needs:
       - generate
     runs-on: ubuntu-latest
