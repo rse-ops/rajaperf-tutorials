@@ -21,6 +21,7 @@ jobs:
         root: tutorials
 
   build:
+    if: ${{ needs.generate.outputs.is_empty == 'false' }}
     needs:
       - generate
     runs-on: ubuntu-latest
@@ -29,8 +30,8 @@ jobs:
       matrix:
         result: ${{ fromJson(needs.generate.outputs.matrix) }}
 
-    if: ${{ needs.generate.outputs.is_empty == 'false' }}
     name: "Build ${{ matrix.result.container_name }}" 
+    if: ${{ needs.generate.outputs.is_empty == 'false' }}
     steps:
     - uses: rse-ops/ci/uptodate/build@main
       with:
