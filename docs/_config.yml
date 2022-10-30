@@ -1,0 +1,42 @@
+title: Tutorials
+email: radiuss@llnl.gov
+description: This is an rse-ops tutorial for you to try out cool software!
+
+# UPDATE THIS METADATA FOR YOUR TUTORIAL REPOSITORY ##
+baseurl: /rajaperf-tutorials
+repo: rse-ops/rajaperf-tutorials
+branch: main
+######################################################
+
+twitter-img: /assets/img/rse-ops-circle.png
+twitter: vsoch
+twitter_card: summary
+
+# Defaults
+defaults:
+  -
+    scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
+      is_post: true 
+
+# Post pagination
+paginate: 5
+paginate_path: "/news/page:num/"
+permalink: /:categories/:year/:title/
+
+exclude:
+  - .jekyll-cache
+  - env
+  
+theme: minima
+plugins:
+  - jekyll-feed

@@ -1,0 +1,14 @@
+---
+layout: null
+permalink: /api/
+---
+
+{"tutorials": "{{ site.url }}{{ site.baseurl }}/api/tutorials.json",
+ "languages": "{{ site.url }}{{ site.baseurl }}/api/languages.json",
+ "releases": "{{ site.url }}{{ site.baseurl }}/api/releases.json",
+ "repos": "{{ site.url }}{{ site.baseurl }}/api/repos.json",
+ "repos-metadata": "{{ site.url }}{{ site.baseurl }}/api/repos-metadata.json",
+ "stars": "{{ site.url }}{{ site.baseurl }}/api/stars.json",
+ "topics": "{{ site.url }}{{ site.baseurl }}/api/topics.json",
+ "commits": "{{ site.url }}{{ site.baseurl }}/api/commits.json",
+ "lines": "{{ site.url }}{{ site.baseurl }}/api/lines.json"}
