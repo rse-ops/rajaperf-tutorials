@@ -9,4 +9,4 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
     - name: Validate Data
-      uses: rse-ops/tutorials-actions/validate@main
+      uses: rse-ops/tutorial-actions/validate@main
