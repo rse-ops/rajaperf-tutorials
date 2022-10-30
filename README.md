@@ -1,6 +1,10 @@
 # RAJAPerf Tutorial
 
-This repository contains RAjAPerf tutorials! 
+This repository contains RAjAPerf tutorials! You can
+look at the [tutorial-actions](https://github.com/rse-ops/tutorial-actions)
+to better understand the automation and assets here. Each tutorial is focused
+around learning or trying a piece of software, and we will have a tool
+that can easily deploy them.
 
 🚧️ **under development** 🚧️
 
