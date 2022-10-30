@@ -1,6 +1,6 @@
 title: "RAJAPerf Tutorial (under development)"
 container:
-  name: docker build -t ghcr.io/rse-ops/rajaperf-tutorials:ubuntu-basic
+  name: ghcr.io/rse-ops/rajaperf-tutorials:ubuntu-basic
   env:
     - name: password
       optional: true
