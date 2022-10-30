@@ -1,7 +1,11 @@
 ARG ubuntu_version=22.04
 FROM ubuntu:${ubuntu_version}
 
-# docker build -t basic .
+# docker build -t ghcr.io/rse-ops/rajaperf-tutorials:ubuntu-basic .
+# Note that I never got this working with spack, in any way/shape/form.
+# The build also failed as automated in the CI, so I built locally and pushed.
+# Is this ideal or perfect? No, but at least we have the container build to
+# start with, and someone a lot more patient with spack can try again.
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install \
@@ -52,5 +56,5 @@ RUN cd /code && \
 # TODO we will want to:
 # 1. Figure out a visualization strategy here
 # 2. Get it into a notebook / VSCode interface to run and see
-# 3. Possibly re-add openmpi install, and possibly install with spack.
+# 3. Possibly re-add openmpi install.
 WORKDIR /code/build_ubuntu-gcc-caliper-11
