@@ -15,7 +15,7 @@
         },
         "licenseInfo": {
             "name": "BSD 3-Clause \"New\" or \"Revised\" License",
-            "nickname": null,
+            "nickname": "Modified BSD License",
             "spdxId": "BSD-3-Clause",
             "url": "http://choosealicense.com/licenses/bsd-3-clause/"
         },
@@ -39,13 +39,13 @@
         },
         "parent": null,
         "pullRequests_Open": {
-            "totalCount": 14
+            "totalCount": 15
         },
         "pullRequests_Closed": {
-            "totalCount": 40
+            "totalCount": 41
         },
         "pullRequests_Merged": {
-            "totalCount": 174
+            "totalCount": 175
         },
         "issues_Open": {
             "totalCount": 19
