@@ -1,60 +1,62 @@
 ARG ubuntu_version=22.04
-FROM ubuntu:${ubuntu_version}
+FROM ghcr.io/rse-ops/ubuntu:$ubuntu_version
 
-# docker build -t ghcr.io/rse-ops/rajaperf-tutorials:ubuntu-basic .
-# Note that I never got this working with spack, in any way/shape/form.
-# The build also failed as automated in the CI, so I built locally and pushed.
-# Is this ideal or perfect? No, but at least we have the container build to
-# start with, and someone a lot more patient with spack can try again.
+# Install gcc with spack  .. we leave default ubuntu 22.04 gcc i.e in /usr/bin alone since apps depends on it's stdlib
+ARG gcc_version=10.2.0
+ARG JOBS=4
+ENV gcc_version=$gcc_version \
+    gcc_spec="gcc@${gcc_version}+bootstrap+strip+binutils languages=c,c++,fortran,lto" \
+    COMPILER_NAME=gcc \
+    COMPILER_VERSION=$gcc_version \
+    CC=/usr/bin/gcc \
+    CXX=/usr/bin/g++ \
+    FC=/usr/bin/gfortran \
+    CPP=/usr/bin/cpp
 
-RUN apt-get update
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install \
-    python3-pip \
-    git \
-    cmake \
-    wget
+RUN apt-get -qq update \
+ && apt-get -qq install -y --no-install-recommends gfortran gawk texinfo mpich libmpich-dev \
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get clean
 
-# Install caliper
-RUN git clone https://github.com/LLNL/Caliper.git /caliper && \
-    cd /caliper && \
-    mkdir -p build && cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make && make install
+# build compiler and set defaults
+# note the IFS to split the spec, spack can't tolerate a single-string spec with
+# multiple flags components apparently
+RUN spack external find hwloc ncurses gawk texinfo mpich \
+ && EXTRA_LANG=$(bash -c "[[ ${gcc_version} > 5 ]] && echo ',jit'" || true) \
+ && spack spec --reuse ${gcc_spec}$EXTRA_LANG "^binutils@2.38:" \
+ && spack mirror add develop https://binaries.spack.io/releases/develop \
+ && spack buildcache keys --install --trust \
+ && spack add ${gcc_spec} \
+ && spack -v install --jobs $JOBS --deprecated \
+ && spack compiler add \
+ && spack config add "packages:all:compiler:[${COMPILER_NAME}@${COMPILER_VERSION}]" 
 
-# Install adiak
-RUN wget https://github.com/LLNL/Adiak/releases/download/v0.2.1/adiak-0.2.1.tar.gz && \
-    tar -xzvf adiak-0.2.1.tar.gz && \
-    cd adiak-0.2.1 && \
-    mkdir build && cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make && make install
+WORKDIR /code
+RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf 
 
-# Install camp
-RUN git clone --recursive https://github.com/LLNL/camp /camp && \
-    cd /camp && \
-    git submodule update && \
-    mkdir -p build && cd build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make && make install
+#prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
+# we copy scripts/spack_packages into that empty packages dir in the repo
+RUN spack repo create /code/RAJAPerf/spack_repo raja_perf
+WORKDIR /code/RAJAPerf
+RUN cp -r scripts/spack_packages/* spack_repo/packages/
+RUN spack repo add /code/RAJAPerf/spack_repo/ 
+
+# create host config file and build using it
+RUN spack dev-build -u hostconfig raja_perf@develop%gcc@10.2.0 +caliper ^caliper@master ^mpich@4.0
+RUN mkdir build
+WORKDIR /code/RAJAPerf/build
+# assume there's only one host config file
+RUN cmake -C ../hc* ..
+RUN make -j $JOBS
     
-# Install hatchet
-RUN git clone https://github.com/LLNL/hatchet /hatchet && \
-    cd /hatchet && \
+## Install hatchet
+WORKDIR /code
+RUN git clone https://github.com/LLNL/hatchet && \
+    cd hatchet && \
     pip install llnl-hatchet && \
     pip install -r requirements.txt
     
-RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf /code && ldconfig
-COPY notebooks/build_rajaperf.sh /code/scripts/ubuntu-builds/build_rajaperf.sh
-RUN cd /code && \
-    git submodule update --recursive && \
-    chmod +x ./scripts/ubuntu-builds/build_rajaperf.sh && \
-    ./scripts/ubuntu-builds/build_rajaperf.sh 11 && \
-    cd build_ubuntu-gcc-caliper-11 && \
-    # Slower without -j but won't crash or freeze a machine!
-    make && make install
 
 # TODO we will want to:
-# 1. Figure out a visualization strategy here
+# 1. Figure out a visualization strategy here based on thicket/seaborn
 # 2. Get it into a notebook / VSCode interface to run and see
-# 3. Possibly re-add openmpi install.
-WORKDIR /code/build_ubuntu-gcc-caliper-11
