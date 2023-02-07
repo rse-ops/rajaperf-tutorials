@@ -1,6 +1,56 @@
 ARG ubuntu_version=22.04
 FROM ghcr.io/rse-ops/ubuntu:$ubuntu_version
 
+ARG password=ubuntu
+#setup ubuntu user
+RUN useradd -m -d /home/ubuntu -s /usr/bin/bash -g users -G sudo -u 1001 ubuntu
+
+SHELL ["/usr/bin/bash", "-o", "pipefail", "-c"]
+RUN echo 'ubuntu:ubuntu' | chpasswd
+
+RUN apt-get -qq update \
+ && apt-get -qq install -y --no-install-recommends gfortran gawk texinfo mpich libmpich-dev python3-pip npm 
+
+RUN apt-get clean \
+    && apt-get autoremove \
+    &&  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN npm install -g configurable-http-proxy 
+
+RUN chmod -R 775 /opt
+
+ARG jupyterhub_version=2.3.1
+
+# Generate self-signed cert and key for local use
+RUN mkdir -p /srv/certs && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+          -subj  "/C=US/ST=CA/O=radiuss-tutorial/CN=radiuss-playground.org" \
+          -keyout /srv/certs/jupyter-selfsigned.key \
+          -out /srv/certs/jupyter-selfsigned.crt && \
+          chown -R ubuntu /srv/certs
+
+# Or copy cert and key signed by a trusted CA
+# COPY fullchain.pem /srv/jupyterhub/fullchain.pem
+# COPY privkey.pem /srv/jupyterhub/privkey.pem
+
+# Add template override directory and copy our example
+RUN mkdir -p /srv/jupyterhub/overrides 
+
+COPY notebooks/login.html /srv/jupyterhub/overrides/login.html
+
+COPY --chown=ubuntu:users ./notebooks/jupyterhub_config.py /home/ubuntu/jupyterhub_config.py
+
+#RUN git clone https://github.com/flux-framework/flux-workflow-examples.git ./notebooks/flux-workflow-examples
+COPY --chown=ubuntu:users ./notebooks/ /home/ubuntu/notebooks
+COPY --chown=ubuntu:users ./notebooks/welcome.sh /welcome.sh 
+COPY --chown=ubuntu:users ./notebooks/entrypoint.sh /entrypoint.sh
+
+USER ubuntu
+WORKDIR /home/ubuntu
+RUN mkdir code
+ENV password=${password}
+ENV PATH=/home/ubuntu/.local/bin:$PATH
+
 # Install gcc with spack  .. we leave default ubuntu 22.04 gcc i.e in /usr/bin alone since apps depends on it's stdlib
 ARG gcc_version=10.2.0
 ARG JOBS=4
@@ -13,50 +63,61 @@ ENV gcc_version=$gcc_version \
     FC=/usr/bin/gfortran \
     CPP=/usr/bin/cpp
 
-RUN apt-get -qq update \
- && apt-get -qq install -y --no-install-recommends gfortran gawk texinfo mpich libmpich-dev \
- && rm -rf /var/lib/apt/lists/* \
- && apt-get clean
+RUN pip3 install --upgrade pip \
+    && pip3 install setuptools-rust zipp==3.7.0 \
+    && pip3 install jupyterhub \
+    && python3 -m pip install jupyterlab notebook \
+    && echo "export PATH=$HOME/.local/bin:$PATH" >> "$HOME/.bashrc"
+
+ 
+#RUN spack external find hwloc ncurses gawk texinfo mpich \
+# && spack compiler find
 
 # build compiler and set defaults
 # note the IFS to split the spec, spack can't tolerate a single-string spec with
 # multiple flags components apparently
-RUN spack external find hwloc ncurses gawk texinfo mpich \
- && EXTRA_LANG=$(bash -c "[[ ${gcc_version} > 5 ]] && echo ',jit'" || true) \
- && spack spec --reuse ${gcc_spec}$EXTRA_LANG "^binutils@2.38:" \
- && spack mirror add develop https://binaries.spack.io/releases/develop \
- && spack buildcache keys --install --trust \
- && spack add ${gcc_spec} \
- && spack -v install --jobs $JOBS --deprecated \
- && spack compiler add \
- && spack config add "packages:all:compiler:[${COMPILER_NAME}@${COMPILER_VERSION}]" 
+#RUN spack external find hwloc ncurses gawk texinfo mpich \
+# && EXTRA_LANG=$(bash -c "[[ ${gcc_version} > 5 ]] && echo ',jit'" || true) \
+# && spack spec --reuse ${gcc_spec}$EXTRA_LANG "^binutils@2.38:" \
+# && spack mirror add develop https://binaries.spack.io/releases/develop \
+# && spack buildcache keys --install --trust \
+# && spack add ${gcc_spec} \
+# && spack -v install --jobs $JOBS --deprecated \
+# && spack compiler add \
+# && spack config add "packages:all:compiler:[${COMPILER_NAME}@${COMPILER_VERSION}]" 
 
-WORKDIR /code
-RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf 
+#WORKDIR /home/ubuntu/code
+#RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf 
 
 #prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
 # we copy scripts/spack_packages into that empty packages dir in the repo
-RUN spack repo create /code/RAJAPerf/spack_repo raja_perf
-WORKDIR /code/RAJAPerf
-RUN cp -r scripts/spack_packages/* spack_repo/packages/
-RUN spack repo add /code/RAJAPerf/spack_repo/ 
+#RUN spack repo create /home/ubuntu/code/RAJAPerf/spack_repo raja_perf
+#WORKDIR /home/ubuntu/code/RAJAPerf
+#RUN cp -r scripts/spack_packages/* spack_repo/packages/
+#RUN spack repo add /home/ubuntu/code/RAJAPerf/spack_repo/ 
 
 # create host config file and build using it
-RUN spack dev-build -u hostconfig raja_perf@develop%gcc@10.2.0 +caliper ^caliper@master ^mpich@4.0
-RUN mkdir build
-WORKDIR /code/RAJAPerf/build
+#RUN spack dev-build -u hostconfig raja_perf@develop +caliper ^caliper@master ^mpich@4.0
+#RUN mkdir build
+#WORKDIR /home/ubuntu/code/RAJAPerf/build
 # assume there's only one host config file
-RUN cmake -C ../hc* ..
-RUN make -j $JOBS
+#RUN cmake -C ../hc* ..
+#RUN make -j $JOBS
     
 ## Install hatchet
-WORKDIR /code
-RUN git clone https://github.com/LLNL/hatchet && \
-    cd hatchet && \
-    pip install llnl-hatchet && \
-    pip install -r requirements.txt
+#WORKDIR /home/ubuntu/code
+#RUN git clone https://github.com/LLNL/hatchet && \
+#    cd hatchet && \
+#    pip install llnl-hatchet && \
+#    pip install -r requirements.txt
     
 
-# TODO we will want to:
-# 1. Figure out a visualization strategy here based on thicket/seaborn
-# 2. Get it into a notebook / VSCode interface to run and see
+ENV SHELL=/usr/bin/bash
+ENV FLUX_URI_RESOLVE_LOCAL=t
+
+# This allows the running user to set the password on the container start
+
+CMD /usr/bin/bash /welcome.sh && \
+    echo "c.DummyAuthenticator.password = \"${password}\"" >> /home/ubuntu/jupyterhub_config.py && \
+    /usr/bin/bash /entrypoint.sh
+
