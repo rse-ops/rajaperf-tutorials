@@ -1,0 +1,58 @@
+FROM jupyter/scipy-notebook
+
+#USER root
+#RUN apt-get update -y
+#RUN apt-get install libomp-dev -fy
+
+USER $NB_USER:$NB_GID
+
+RUN mamba create -n cling && source activate cling && \
+  mamba install -c conda-forge -y  \
+    xeus-cling=0.15.0 \
+    mpich \
+    cmake \
+    vim \
+    gfortran=10.4.0 \
+    gxx=10.4.0 \
+    binutils \
+    make \
+    ninja
+
+# Make RUN commands use the new environment:
+RUN echo "source activate cling" >> $HOME/.bashrc
+SHELL ["/bin/bash", "--login", "-c"]
+
+ENV PREFIX=/opt/conda/envs/cling/share/jupyter/kernels
+COPY --chown=$NB_USER:$NB_GID xcpp17-omp/ $PREFIX/xcpp17-omp/
+
+RUN jupyter kernelspec install $PREFIX/xcpp17 --sys-prefix && \
+  jupyter kernelspec install $PREFIX/xcpp17-omp --sys-prefix
+
+COPY --chown=$NB_USER:$NB_GID notebooks/xeus-min $HOME/work/notebooks
+COPY --chown=$NB_USER:$NB_GID set-up-spack.sh $HOME/scripts/
+
+RUN chmod +x scripts/set-up-spack.sh && ./scripts/set-up-spack.sh
+#/opt/conda/envs/cling/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=${HOME}/spack/bin:/opt/conda/envs/cling/bin:/opt/conda/condabin:${PATH}
+RUN echo "export PATH=${PATH}" >> $HOME/.bashrc && \
+    echo ". ${HOME}/spack/share/spack/setup-env.sh" >> $HOME/.bashrc && \
+    echo "spack env activate  --dir ${HOME}/spack_env" >> $HOME/.bashrc
+# our spack.yaml has a raja%gcc@10.4.0 spec which we install after we activate the environment
+COPY --chown=$NB_USER:$NB_GID spack.yaml $HOME/spack_env/
+RUN  eval `spack env activate --sh --dir $HOME/spack_env` && spack install
+# g++ (conda-forge gcc 10.4.0-19) 10.4.0
+# 
+#(cling) jovyan@d37702b56b3d:~$ /opt/conda/envs/cling/bin/clang --version
+#clang version 9.0.1 (https://github.com/conda-forge/clangdev-feedstock 2ea3b72da24769de0dfc6dac99251a5d7a46144d)
+#
+# to run container use docker run -p 8888:8888
+
+# ENV
+# NB_USER=jovyan
+# NB_UID=1000
+# NB_GID=100
+# PWD=/home/jovyan
+# CONDA_PREFIX=/opt/conda
+# HOME=/home/jovyan
+COPY --chown=$NB_USER:$NB_GID entry_point_xeus.sh $HOME/scripts/
+ENTRYPOINT ["/bin/bash","-c","$HOME/scripts/entry_point_xeus.sh"]

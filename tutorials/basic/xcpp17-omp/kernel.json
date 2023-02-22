@@ -1,0 +1,11 @@
+{
+  "display_name": "C++17-omp",
+  "argv": [
+    "/opt/conda/envs/cling/bin//xcpp",
+    "-f",
+    "{connection_file}",
+    "-std=c++17",
+    "-fopenmp"
+  ],
+  "language": "C++17"
+}

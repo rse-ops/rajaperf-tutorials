@@ -10,5 +10,5 @@
 #  -Slog-stderr-level=0 \
 #  -Slog-stderr-mode=local"
 
-/home/ubuntu/.local/bin/jupyterhub -f /home/ubuntu/jupyterhub_config.py
+/home/perfuser/.local/bin/jupyterhub -f /home/perfuser/jupyterhub_config.py
 

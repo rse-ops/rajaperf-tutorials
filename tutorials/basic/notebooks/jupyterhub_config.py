@@ -7,8 +7,8 @@ c.JupyterHub.authenticator_class = "dummy"
 c.JupyterHub.ssl_key = '/srv/certs/jupyter-selfsigned.key'
 c.JupyterHub.ssl_cert = '/srv/certs/jupyter-selfsigned.crt'
 
-# Notebooks are in ubuntu user home
-c.Spawner.notebook_dir='/home/ubuntu/notebooks'
+c.Spawner.notebook_dir='/home/perfuser/notebooks'
+#c.Spawner.default_url = "/lab"
 # Or you can use certificates and keys from an 
 # authority
 # c.JupyterHub.ssl_key = '/srv/jupyterhub/privkey.pem'

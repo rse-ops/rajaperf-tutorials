@@ -1,12 +1,12 @@
 ARG ubuntu_version=22.04
 FROM ghcr.io/rse-ops/ubuntu:$ubuntu_version
 
-ARG password=ubuntu
-#setup ubuntu user
-RUN useradd -m -d /home/ubuntu -s /usr/bin/bash -g users -G sudo -u 1001 ubuntu
+ARG password=perfuser
+#setup perfuser
+RUN useradd -m -d /home/perfuser -s /usr/bin/bash -g users -G sudo -u 1000 perfuser
 
 SHELL ["/usr/bin/bash", "-o", "pipefail", "-c"]
-RUN echo 'ubuntu:ubuntu' | chpasswd
+RUN echo 'perfuser:perfuser' | chpasswd
 
 RUN apt-get -qq update \
  && apt-get -qq install -y --no-install-recommends gfortran gawk texinfo mpich libmpich-dev python3-pip npm 
@@ -27,7 +27,7 @@ RUN mkdir -p /srv/certs && \
           -subj  "/C=US/ST=CA/O=radiuss-tutorial/CN=radiuss-playground.org" \
           -keyout /srv/certs/jupyter-selfsigned.key \
           -out /srv/certs/jupyter-selfsigned.crt && \
-          chown -R ubuntu /srv/certs
+          chown -R perfuser /srv/certs
 
 # Or copy cert and key signed by a trusted CA
 # COPY fullchain.pem /srv/jupyterhub/fullchain.pem
@@ -38,18 +38,18 @@ RUN mkdir -p /srv/jupyterhub/overrides
 
 COPY notebooks/login.html /srv/jupyterhub/overrides/login.html
 
-COPY --chown=ubuntu:users ./notebooks/jupyterhub_config.py /home/ubuntu/jupyterhub_config.py
+COPY --chown=perfuser:users ./notebooks/jupyterhub_config.py /home/perfuser/jupyterhub_config.py
 
 #RUN git clone https://github.com/flux-framework/flux-workflow-examples.git ./notebooks/flux-workflow-examples
-COPY --chown=ubuntu:users ./notebooks/ /home/ubuntu/notebooks
-COPY --chown=ubuntu:users ./notebooks/welcome.sh /welcome.sh 
-COPY --chown=ubuntu:users ./notebooks/entrypoint.sh /entrypoint.sh
+COPY --chown=perfuser:users ./notebooks/ /home/perfuser/notebooks
+COPY --chown=perfuser:users ./notebooks/welcome.sh /welcome.sh 
+COPY --chown=perfuser:users ./notebooks/entrypoint.sh /entrypoint.sh
 
-USER ubuntu
-WORKDIR /home/ubuntu
+USER perfuser
+WORKDIR /home/perfuser
 RUN mkdir code
 ENV password=${password}
-ENV PATH=/home/ubuntu/.local/bin:$PATH
+ENV PATH=/home/perfuser/.local/bin:$PATH
 
 # Install gcc with spack  .. we leave default ubuntu 22.04 gcc i.e in /usr/bin alone since apps depends on it's stdlib
 ARG gcc_version=10.2.0
@@ -86,26 +86,26 @@ RUN pip3 install --upgrade pip \
 # && spack compiler add \
 # && spack config add "packages:all:compiler:[${COMPILER_NAME}@${COMPILER_VERSION}]" 
 
-#WORKDIR /home/ubuntu/code
+#WORKDIR /home/perfuser/code
 #RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf 
 
 #prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
 # we copy scripts/spack_packages into that empty packages dir in the repo
-#RUN spack repo create /home/ubuntu/code/RAJAPerf/spack_repo raja_perf
-#WORKDIR /home/ubuntu/code/RAJAPerf
+#RUN spack repo create /home/perfuser/code/RAJAPerf/spack_repo raja_perf
+#WORKDIR /home/perfuser/code/RAJAPerf
 #RUN cp -r scripts/spack_packages/* spack_repo/packages/
-#RUN spack repo add /home/ubuntu/code/RAJAPerf/spack_repo/ 
+#RUN spack repo add /home/perfuser/code/RAJAPerf/spack_repo/ 
 
 # create host config file and build using it
 #RUN spack dev-build -u hostconfig raja_perf@develop +caliper ^caliper@master ^mpich@4.0
 #RUN mkdir build
-#WORKDIR /home/ubuntu/code/RAJAPerf/build
+#WORKDIR /home/perfuser/code/RAJAPerf/build
 # assume there's only one host config file
 #RUN cmake -C ../hc* ..
 #RUN make -j $JOBS
     
 ## Install hatchet
-#WORKDIR /home/ubuntu/code
+#WORKDIR /home/perfuser/code
 #RUN git clone https://github.com/LLNL/hatchet && \
 #    cd hatchet && \
 #    pip install llnl-hatchet && \
@@ -113,11 +113,10 @@ RUN pip3 install --upgrade pip \
     
 
 ENV SHELL=/usr/bin/bash
-ENV FLUX_URI_RESOLVE_LOCAL=t
 
 # This allows the running user to set the password on the container start
 
 CMD /usr/bin/bash /welcome.sh && \
-    echo "c.DummyAuthenticator.password = \"${password}\"" >> /home/ubuntu/jupyterhub_config.py && \
+    echo "c.DummyAuthenticator.password = \"${password}\"" >> /home/perfuser/jupyterhub_config.py && \
     /usr/bin/bash /entrypoint.sh
 
