@@ -4,8 +4,9 @@
 # configuration settings.
 spack:
   # add package specs to the `specs` list
-  specs: [raja%gcc@10.4.0]
-  view: true
+  #specs: [raja%gcc@10.4.0,raja%clang@9.0.1]
+  specs: []
+  view: false
   concretizer:
     unify: false
   compilers:

@@ -5,6 +5,7 @@
     "-f",
     "{connection_file}",
     "-std=c++17",
+    "-stdlib=libstdc++",
     "-fopenmp"
   ],
   "language": "C++17"
