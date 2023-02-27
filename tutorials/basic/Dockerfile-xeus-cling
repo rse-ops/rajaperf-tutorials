@@ -1,9 +1,5 @@
 FROM jupyter/scipy-notebook
 
-#USER root
-#RUN apt-get update -y
-#RUN apt-get install libomp-dev -fy
-
 USER $NB_USER:$NB_GID
 
 RUN mamba create -n cling && source activate cling && \
@@ -36,7 +32,7 @@ COPY --chown=$NB_USER:$NB_GID xcpp17-omp/ $PREFIX/xcpp17-omp/
 RUN jupyter kernelspec install $PREFIX/xcpp17 --sys-prefix && \
   jupyter kernelspec install $PREFIX/xcpp17-omp --sys-prefix
 
-COPY --chown=$NB_USER:$NB_GID notebooks/xeus-min $HOME/work/notebooks
+COPY --chown=$NB_USER:$NB_GID notebooks $HOME/notebooks
 COPY --chown=$NB_USER:$NB_GID set-up-spack.sh $HOME/scripts/
 COPY --chown=$NB_USER:$NB_GID add_spack_packages.sh $HOME/scripts/
 
