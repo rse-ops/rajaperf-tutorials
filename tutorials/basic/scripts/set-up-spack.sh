@@ -28,6 +28,6 @@ spack config add 'concretizer:unify:false'
 spack env create --dir $HOME/spack_env
 spack env activate --dir $HOME/spack_env
 spack external find --scope env:$HOME/spack_env
-spack external find -p /opt/conda/envs/cling --scope env:$HOME/spack_env python perl mpich bzip2 xz
+spack external find -p /opt/conda/envs/cling --scope env:$HOME/spack_env python perl mpich bzip2 xz zlib elfutils
 
 popd

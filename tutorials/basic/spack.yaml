@@ -120,3 +120,12 @@ spack:
       externals:
         - spec: openssh@8.9p1
           prefix: /usr
+    zlib:
+      externals:
+        - spec: zlib@1.2
+          prefix: /opt/conda/envs/cling
+    elfutils:
+      externals:
+        - spec: elfutils@0.18
+          prefix: /opt/conda/envs/cling
+
