@@ -13,8 +13,8 @@ cp -r scripts/spack_packages/* spack_repo/packages/
 spack repo add $HOME/code/RAJAPerf/spack_repo/ 
 
 # create host config file and build using it
-spack dev-build -U -u hostconfig raja_perf@develop%gcc@10.4.0 +caliper ^caliper@master ~mpi ldflags="-Wl,-rpath-link,/opt/conda/envs/cling/lib"
-spack dev-build -U -u hostconfig raja_perf@develop%clang@9.0.1 +caliper ^caliper@master%gcc@10.4.0 ~mpi ldflags="-Wl,-rpath-link,/opt/conda/envs/cling/lib"
+spack dev-build -U -q -u hostconfig raja_perf@develop%gcc@10.4.0 +caliper ^caliper@master ~mpi ldflags="-Wl,-rpath-link,/opt/conda/envs/cling/lib"
+spack dev-build -U -q -u hostconfig raja_perf@develop%clang@9.0.1 +caliper ^caliper@master%gcc@10.4.0 ~mpi ldflags="-Wl,-rpath-link,/opt/conda/envs/cling/lib"
 mkdir build_gcc && mkdir build_clang
 pushd $HOME/code/RAJAPerf/build_gcc
 cmake -C ../hc*gcc* ..
@@ -23,9 +23,8 @@ popd
 pushd $HOME/code/RAJAPerf/build_clang
 cmake -C ../hc*clang* ..
 make -j
-# we could have run prior ldconfig after copying lomp, but adding this is easy enough for now
-patchelf --add-rpath /usr/local/lib bin/raja-perf.exe
 popd
 popd
 popd
+/opt/conda/bin/python -m pip install llnl-hatchet
 

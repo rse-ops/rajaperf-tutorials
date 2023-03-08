@@ -18,14 +18,15 @@ RUN mamba create -n cling && source activate cling && \
     zlib \
     libunwind \
     patchelf \
-    lmod
+    lmod 
 # fixup OpenMP header and lib paths to satisfy header search and ld search and ldconfig search
 # todo run ldconfig after to pickup libs in /usr/local/lib
 USER root
 RUN mkdir -p /opt/conda/envs/cling/lib/clang/9.0.1/include && \
     cp /opt/conda/lib/clang/15.0.7/include/omp.h /opt/conda/envs/cling/lib/clang/9.0.1/include/omp.h  && \
     cp  /opt/conda/lib/libomp.so /usr/local/lib/libomp.so && \
-    cp  /opt/conda/lib/libomp.so /opt/conda/envs/cling/x86_64-conda-linux-gnu/sysroot/lib64/
+    cp  /opt/conda/lib/libomp.so /opt/conda/envs/cling/x86_64-conda-linux-gnu/sysroot/lib64/ && \
+    ldconfig -v 2> /dev/null
 
 USER $NB_USER:$NB_GID
 # Make RUN commands use the new environment:
@@ -41,10 +42,6 @@ RUN jupyter kernelspec install $PREFIX/xcpp17 --sys-prefix && \
 COPY --chown=$NB_USER:$NB_GID notebooks $HOME/notebooks
 COPY --chown=$NB_USER:$NB_GID scripts $HOME/scripts
 
-#COPY --chown=$NB_USER:$NB_GID set-up-spack.sh $HOME/scripts/
-#COPY --chown=$NB_USER:$NB_GID add_spack_packages.sh $HOME/scripts/
-#COPY --chown=$NB_USER:$NB_GID add_code_packages.sh $HOME/scripts/
-
 RUN chmod +x scripts/set-up-spack.sh && ./scripts/set-up-spack.sh
 #/opt/conda/envs/cling/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV PATH=${HOME}/spack/bin:/opt/conda/envs/cling/bin:/opt/conda/condabin:${PATH}
@@ -56,6 +53,9 @@ COPY --chown=$NB_USER:$NB_GID spack.yaml $HOME/spack_env/
 # then install raja-perf using spack dev-build
 RUN chmod +x scripts/add_spack_packages.sh && ./scripts/add_spack_packages.sh && \
     chmod +x scripts/add_code_packages.sh && ./scripts/add_code_packages.sh
+
+
+# Just some general notes about this Dockerfile before we call the entrypoint
 # g++ (conda-forge gcc 10.4.0-19) 10.4.0
 # 
 #(cling) jovyan@d37702b56b3d:~$ /opt/conda/envs/cling/bin/clang --version
@@ -70,5 +70,6 @@ RUN chmod +x scripts/add_spack_packages.sh && ./scripts/add_spack_packages.sh &&
 # PWD=/home/jovyan
 # CONDA_PREFIX=/opt/conda
 # HOME=/home/jovyan
-#COPY --chown=$NB_USER:$NB_GID entry_point_xeus.sh $HOME/scripts/
+
+
 ENTRYPOINT ["/bin/bash","-c","$HOME/scripts/entry_point_xeus.sh"]
