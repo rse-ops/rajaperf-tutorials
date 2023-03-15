@@ -2,7 +2,7 @@
     "LLNL/RAJAPerf": {
         "languages": {
             "totalCount": 5,
-            "totalSize": 2131065,
+            "totalSize": 2112455,
             "nodes": [
                 {
                     "name": "C++",
@@ -17,12 +17,12 @@
                     "color": "#DA3434"
                 },
                 {
-                    "name": "Python",
-                    "color": "#3572A5"
-                },
-                {
                     "name": "Dockerfile",
                     "color": "#384d54"
+                },
+                {
+                    "name": "Python",
+                    "color": "#3572A5"
                 }
             ],
             "edges": [
@@ -30,16 +30,16 @@
                     "size": 2016691
                 },
                 {
-                    "size": 54888
+                    "size": 54949
                 },
                 {
                     "size": 31683
                 },
                 {
-                    "size": 23119
+                    "size": 4684
                 },
                 {
-                    "size": 4684
+                    "size": 4448
                 }
             ]
         }
