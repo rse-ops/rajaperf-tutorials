@@ -2,7 +2,7 @@ FROM jupyter/scipy-notebook
 
 USER $NB_USER:$NB_GID
 
-RUN mamba create -n cling && source activate cling && \
+RUN mamba create -n cling python=3.10.9 && source activate cling && \
   mamba install -c conda-forge -y  \
     xeus-cling=0.15.0 \
     libstdcxx-devel_linux-64=*=*19 \

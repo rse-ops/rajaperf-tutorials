@@ -26,5 +26,7 @@ make -j
 popd
 popd
 popd
-/opt/conda/bin/python -m pip install llnl-hatchet
+# install for notebook and environment
+python3 -m pip install llnl-hatchet
+/opt/conda/bin/python3 -m pip install llnl-hatchet
 
