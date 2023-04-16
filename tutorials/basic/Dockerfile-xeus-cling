@@ -41,6 +41,7 @@ RUN jupyter kernelspec install $PREFIX/xcpp17 --sys-prefix && \
 
 COPY --chown=$NB_USER:$NB_GID notebooks $HOME/notebooks
 COPY --chown=$NB_USER:$NB_GID scripts $HOME/scripts
+COPY --chown=$NB_USER:$NB_GID skeletal $HOME/skeletal
 
 RUN chmod +x scripts/set-up-spack.sh && ./scripts/set-up-spack.sh
 #/opt/conda/envs/cling/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

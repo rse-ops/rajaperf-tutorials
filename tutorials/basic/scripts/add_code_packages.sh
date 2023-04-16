@@ -11,6 +11,8 @@ git clone --recursive -b pr-from-fork/137 https://github.com/LLNL/RAJAPerf.git
 # we copy scripts/spack_packages into that empty packages dir in the repo
 spack repo create $RAJAPERF_DIR/spack_repo raja_perf
 pushd $RAJAPERF_DIR
+# checkout specific commit hash
+git reset --hard 9ed8761ec743869cfc1d6c88afef0cb841201079
 mkdir -p spack_repo/packages/raja_perf
 cp $HOME/scripts/package.py spack_repo/packages/raja_perf/
 spack repo add $HOME/code/RAJAPerf/spack_repo 
@@ -36,7 +38,9 @@ g++ -shared -o libcommon.so -fPIC -I$RAJA_BASE/raja-2022.03.0-f7p4trkfeq4gcmqnt5
 mv libcommon.so $HOME/code/RAJAPerf/build_gcc/lib
 popd
 
-# install for notebook and environment
-python3 -m pip install llnl-hatchet
-/opt/conda/bin/python3 -m pip install llnl-hatchet
+# install for notebook and environment -- maybe change this to a requirements file specifying all versions
+python3 -m pip install caliper-reader==0.3.0
+python3 -m pip install llnl-hatchet==2022.2.0
+/opt/conda/bin/python3 -m pip install caliper-reader==0.3.0
+/opt/conda/bin/python3 -m pip install llnl-hatchet==2022.2.0
 
