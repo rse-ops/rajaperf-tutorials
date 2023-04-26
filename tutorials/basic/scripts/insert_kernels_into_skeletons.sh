@@ -18,6 +18,7 @@ python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/class_variables.txt 
 
 python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/defaults.txt -o $TUTKERNEL_DIR/TUTORIAL_KERNEL.cpp -s defaults.txt
 python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/kernel_setup.txt -o $TUTKERNEL_DIR/TUTORIAL_KERNEL.cpp -s kernel_setup.txt
+python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/checksum.txt -o $TUTKERNEL_DIR/TUTORIAL_KERNEL.cpp -s checksum.txt
 python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/kernel_teardown.txt -o $TUTKERNEL_DIR/TUTORIAL_KERNEL.cpp -s kernel_teardown.txt
 
 python3 $SCRIPT_DIR/insert_file_at_location.py -i $WORK_DIR/cov_seq.txt -o $TUTKERNEL_DIR/TUTORIAL_KERNEL-seq.cpp -s cov_seq.txt

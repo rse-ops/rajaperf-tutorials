@@ -48,8 +48,8 @@ void TUTORIAL_KERNEL::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 
 void TUTORIAL_KERNEL::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  // later put this into code sippet to be inserted here
-  checksum[vid][tune_idx] += calcChecksum(m_symmat,m_m * m_m, checksum_scale_factor);
+  // insert checksum.txt
+
 }
 
 void TUTORIAL_KERNEL::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
