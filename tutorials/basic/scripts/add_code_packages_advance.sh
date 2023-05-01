@@ -15,7 +15,7 @@ git clone --recursive -b pr-from-fork/137 https://github.com/jonesholger/RAJAPer
 spack repo create $RAJAPERF_DIR/spack_repo raja_perf
 pushd $RAJAPERF_DIR
 # checkout specific commit hash
-git reset --hard dc9ca71561fd3fd48a5f07ca90a2b9a5090e0a13
+git reset --hard 1954dd8
 mkdir -p spack_repo/packages/raja_perf
 cp $HOME/scripts/package.py spack_repo/packages/raja_perf/
 spack repo add $HOME/code/RAJAPerf/spack_repo 
