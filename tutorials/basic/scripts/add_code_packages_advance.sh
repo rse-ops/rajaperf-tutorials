@@ -9,13 +9,13 @@ RAJA_BASE=`spack location -i raja%gcc`
 CAMP_BASE=`spack location -i camp%gcc`
 
 mkdir $HOME/code && pushd $HOME/code
-git clone --recursive -b pr-from-fork/137 https://github.com/jonesholger/RAJAPerf.git
+git clone --recursive -b pr-from-fork/137 https://github.com/LLNL/RAJAPerf.git
 #prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
 # we copy scripts/spack_packages into that empty packages dir in the repo
 spack repo create $RAJAPERF_DIR/spack_repo raja_perf
 pushd $RAJAPERF_DIR
 # checkout specific commit hash
-git reset --hard 1954dd8
+git reset --hard 6d2e1fd
 mkdir -p spack_repo/packages/raja_perf
 cp $HOME/scripts/package.py spack_repo/packages/raja_perf/
 spack repo add $HOME/code/RAJAPerf/spack_repo 
