@@ -1,10 +1,13 @@
 #!/bin/bash
 RAJAPERF_DIR=$HOME/code/RAJAPerf
-RAJA_BASE=/home/jovyan/spack/opt/spack/linux-ubuntu22.04-x86_64/gcc-10.4.0/
+#RAJA_BASE=/home/jovyan/spack/opt/spack/linux-ubuntu22.04-x86_64/gcc-10.4.0/
 eval "$(${CONDA_DIR}/bin/conda shell.bash hook 2> /dev/null)"
 conda activate base
 conda activate cling
 eval `spack env activate --sh --dir $HOME/spack_env`
+RAJA_BASE=`spack location -i raja%gcc`
+CAMP_BASE=`spack location -i camp%gcc`
+
 mkdir $HOME/code && pushd $HOME/code
 git clone --recursive -b pr-from-fork/137 https://github.com/LLNL/RAJAPerf.git
 #prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
@@ -12,7 +15,7 @@ git clone --recursive -b pr-from-fork/137 https://github.com/LLNL/RAJAPerf.git
 spack repo create $RAJAPERF_DIR/spack_repo raja_perf
 pushd $RAJAPERF_DIR
 # checkout specific commit hash
-git reset --hard 9ed8761ec743869cfc1d6c88afef0cb841201079
+git reset --hard 6d2e1fd
 mkdir -p spack_repo/packages/raja_perf
 cp $HOME/scripts/package.py spack_repo/packages/raja_perf/
 spack repo add $HOME/code/RAJAPerf/spack_repo 
@@ -34,7 +37,7 @@ popd
 
 pushd $RAJAPERF_DIR/src/common
 # compile libcommon.so so tutorial can pick up DataUtils
-g++ -shared -o libcommon.so -fPIC -I$RAJA_BASE/raja-2022.03.0-f7p4trkfeq4gcmqnt5623haejgcvwlvl/include/ -I../../build_gcc/include -I$RAJA_BASE/camp-2022.03.2-nh5kkatqzxgiwxusi4ddpyhf2zcqxyow/include/ -I$RAJAPERF_DIR/src -fopenmp *.cpp
+g++ -shared -o libcommon.so -fPIC -I$RAJA_BASE/include/ -I../../build_gcc/include -I$CAMP_BASE/include/ -I$RAJAPERF_DIR/src -fopenmp *.cpp
 mv libcommon.so $HOME/code/RAJAPerf/build_gcc/lib
 popd
 

@@ -1,122 +1,76 @@
-ARG ubuntu_version=22.04
-FROM ghcr.io/rse-ops/ubuntu:$ubuntu_version
+FROM jupyter/scipy-notebook
 
-ARG password=perfuser
-#setup perfuser
-RUN useradd -m -d /home/perfuser -s /usr/bin/bash -g users -G sudo -u 1000 perfuser
+USER $NB_USER:$NB_GID
 
-SHELL ["/usr/bin/bash", "-o", "pipefail", "-c"]
-RUN echo 'perfuser:perfuser' | chpasswd
+RUN mamba create -n cling python=3.10.9 && source activate cling && \
+  mamba install -c conda-forge -y  \
+    xeus-cling=0.15.0 \
+    libstdcxx-devel_linux-64=*=*19 \
+    mpich \
+    cmake \
+    vim \
+    gfortran=10.4.0 \
+    gxx=10.4.0 \
+    binutils \
+    make \
+    ninja \
+    elfutils \
+    zlib \
+    libunwind \
+    patchelf \
+    lmod 
+# fixup OpenMP header and lib paths to satisfy header search and ld search and ldconfig search
+# todo run ldconfig after to pickup libs in /usr/local/lib
+USER root
+RUN mkdir -p /opt/conda/envs/cling/lib/clang/9.0.1/include && \
+    cp /opt/conda/lib/clang/15.0.7/include/omp.h /opt/conda/envs/cling/lib/clang/9.0.1/include/omp.h  && \
+    cp  /opt/conda/lib/libomp.so /usr/local/lib/libomp.so && \
+    cp  /opt/conda/lib/libomp.so /opt/conda/envs/cling/x86_64-conda-linux-gnu/sysroot/lib64/ && \
+    ldconfig -v 2> /dev/null
 
-RUN apt-get -qq update \
- && apt-get -qq install -y --no-install-recommends gfortran gawk texinfo mpich libmpich-dev python3-pip npm 
+USER $NB_USER:$NB_GID
+# Make RUN commands use the new environment:
+RUN echo "source activate cling" >> $HOME/.bashrc
+SHELL ["/bin/bash", "-c"]
 
-RUN apt-get clean \
-    && apt-get autoremove \
-    &&  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENV PREFIX=/opt/conda/envs/cling/share/jupyter/kernels
+COPY --chown=$NB_USER:$NB_GID xcpp17-omp/ $PREFIX/xcpp17-omp/
 
-RUN npm install -g configurable-http-proxy 
+RUN jupyter kernelspec install $PREFIX/xcpp17 --sys-prefix && \
+  jupyter kernelspec install $PREFIX/xcpp17-omp --sys-prefix
 
-RUN chmod -R 775 /opt
+COPY --chown=$NB_USER:$NB_GID notebooks $HOME/notebooks
+COPY --chown=$NB_USER:$NB_GID scripts $HOME/scripts
+COPY --chown=$NB_USER:$NB_GID skeletal $HOME/skeletal
 
-ARG jupyterhub_version=2.3.1
+RUN chmod +x scripts/set-up-spack.sh && ./scripts/set-up-spack.sh
+#/opt/conda/envs/cling/bin:/opt/conda/condabin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=${HOME}/spack/bin:/opt/conda/envs/cling/bin:/opt/conda/condabin:${PATH}
+RUN echo "export PATH=${PATH}" >> $HOME/.bashrc && \
+    echo ". ${HOME}/spack/share/spack/setup-env.sh" >> $HOME/.bashrc && \
+    echo "spack env activate  --dir ${HOME}/spack_env" >> $HOME/.bashrc
+COPY --chown=$NB_USER:$NB_GID spack.yaml $HOME/spack_env/
+#install raja gcc and clang variants after conda init shell commands in an active bash session
+# then install raja-perf using spack dev-build
+RUN chmod +x scripts/add_spack_packages.sh && ./scripts/add_spack_packages.sh && \
+    chmod +x scripts/add_code_packages.sh && ./scripts/add_code_packages.sh
 
-# Generate self-signed cert and key for local use
-RUN mkdir -p /srv/certs && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
-          -subj  "/C=US/ST=CA/O=radiuss-tutorial/CN=radiuss-playground.org" \
-          -keyout /srv/certs/jupyter-selfsigned.key \
-          -out /srv/certs/jupyter-selfsigned.crt && \
-          chown -R perfuser /srv/certs
 
-# Or copy cert and key signed by a trusted CA
-# COPY fullchain.pem /srv/jupyterhub/fullchain.pem
-# COPY privkey.pem /srv/jupyterhub/privkey.pem
+# Just some general notes about this Dockerfile before we call the entrypoint
+# g++ (conda-forge gcc 10.4.0-19) 10.4.0
+# 
+#(cling) jovyan@d37702b56b3d:~$ /opt/conda/envs/cling/bin/clang --version
+#clang version 9.0.1 (https://github.com/conda-forge/clangdev-feedstock 2ea3b72da24769de0dfc6dac99251a5d7a46144d)
+#
+# to run container use docker run -p 8888:8888
 
-# Add template override directory and copy our example
-RUN mkdir -p /srv/jupyterhub/overrides 
+# ENV
+# NB_USER=jovyan
+# NB_UID=1000
+# NB_GID=100
+# PWD=/home/jovyan
+# CONDA_PREFIX=/opt/conda
+# HOME=/home/jovyan
 
-COPY notebooks/login.html /srv/jupyterhub/overrides/login.html
 
-COPY --chown=perfuser:users ./notebooks/jupyterhub_config.py /home/perfuser/jupyterhub_config.py
-
-#RUN git clone https://github.com/flux-framework/flux-workflow-examples.git ./notebooks/flux-workflow-examples
-COPY --chown=perfuser:users ./notebooks/ /home/perfuser/notebooks
-COPY --chown=perfuser:users ./notebooks/welcome.sh /welcome.sh 
-COPY --chown=perfuser:users ./notebooks/entrypoint.sh /entrypoint.sh
-
-USER perfuser
-WORKDIR /home/perfuser
-RUN mkdir code
-ENV password=${password}
-ENV PATH=/home/perfuser/.local/bin:$PATH
-
-# Install gcc with spack  .. we leave default ubuntu 22.04 gcc i.e in /usr/bin alone since apps depends on it's stdlib
-ARG gcc_version=10.2.0
-ARG JOBS=4
-ENV gcc_version=$gcc_version \
-    gcc_spec="gcc@${gcc_version}+bootstrap+strip+binutils languages=c,c++,fortran,lto" \
-    COMPILER_NAME=gcc \
-    COMPILER_VERSION=$gcc_version \
-    CC=/usr/bin/gcc \
-    CXX=/usr/bin/g++ \
-    FC=/usr/bin/gfortran \
-    CPP=/usr/bin/cpp
-
-RUN pip3 install --upgrade pip \
-    && pip3 install setuptools-rust zipp==3.7.0 \
-    && pip3 install jupyterhub \
-    && python3 -m pip install jupyterlab notebook \
-    && echo "export PATH=$HOME/.local/bin:$PATH" >> "$HOME/.bashrc"
-
- 
-#RUN spack external find hwloc ncurses gawk texinfo mpich \
-# && spack compiler find
-
-# build compiler and set defaults
-# note the IFS to split the spec, spack can't tolerate a single-string spec with
-# multiple flags components apparently
-#RUN spack external find hwloc ncurses gawk texinfo mpich \
-# && EXTRA_LANG=$(bash -c "[[ ${gcc_version} > 5 ]] && echo ',jit'" || true) \
-# && spack spec --reuse ${gcc_spec}$EXTRA_LANG "^binutils@2.38:" \
-# && spack mirror add develop https://binaries.spack.io/releases/develop \
-# && spack buildcache keys --install --trust \
-# && spack add ${gcc_spec} \
-# && spack -v install --jobs $JOBS --deprecated \
-# && spack compiler add \
-# && spack config add "packages:all:compiler:[${COMPILER_NAME}@${COMPILER_VERSION}]" 
-
-#WORKDIR /home/perfuser/code
-#RUN git clone --recursive -b use_caliper https://github.com/jonesholger/RAJAPerf 
-
-#prep Spack repo for raja_perf; initially populates spack_repo dir with repo.yaml and empty packages dir
-# we copy scripts/spack_packages into that empty packages dir in the repo
-#RUN spack repo create /home/perfuser/code/RAJAPerf/spack_repo raja_perf
-#WORKDIR /home/perfuser/code/RAJAPerf
-#RUN cp -r scripts/spack_packages/* spack_repo/packages/
-#RUN spack repo add /home/perfuser/code/RAJAPerf/spack_repo/ 
-
-# create host config file and build using it
-#RUN spack dev-build -u hostconfig raja_perf@develop +caliper ^caliper@master ^mpich@4.0
-#RUN mkdir build
-#WORKDIR /home/perfuser/code/RAJAPerf/build
-# assume there's only one host config file
-#RUN cmake -C ../hc* ..
-#RUN make -j $JOBS
-    
-## Install hatchet
-#WORKDIR /home/perfuser/code
-#RUN git clone https://github.com/LLNL/hatchet && \
-#    cd hatchet && \
-#    pip install llnl-hatchet && \
-#    pip install -r requirements.txt
-    
-
-ENV SHELL=/usr/bin/bash
-
-# This allows the running user to set the password on the container start
-
-CMD /usr/bin/bash /welcome.sh && \
-    echo "c.DummyAuthenticator.password = \"${password}\"" >> /home/perfuser/jupyterhub_config.py && \
-    /usr/bin/bash /entrypoint.sh
-
+ENTRYPOINT ["/bin/bash","-c","$HOME/scripts/entry_point_xeus.sh"]
