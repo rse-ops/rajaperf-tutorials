@@ -2,7 +2,7 @@
     "LLNL/RAJAPerf": {
         "languages": {
             "totalCount": 5,
-            "totalSize": 2018965,
+            "totalSize": 2065260,
             "nodes": [
                 {
                     "name": "C++",
@@ -27,13 +27,13 @@
             ],
             "edges": [
                 {
-                    "size": 1922090
+                    "size": 1967919
                 },
                 {
                     "size": 55546
                 },
                 {
-                    "size": 31712
+                    "size": 32178
                 },
                 {
                     "size": 5169
