@@ -1,9 +1,13 @@
 {
     "LLNL/RAJAPerf": {
         "languages": {
-            "totalCount": 5,
-            "totalSize": 2182819,
+            "totalCount": 6,
+            "totalSize": 29649217,
             "nodes": [
+                {
+                    "name": "Jupyter Notebook",
+                    "color": "#DA5B0B"
+                },
                 {
                     "name": "C++",
                     "color": "#f34b7d"
@@ -17,29 +21,32 @@
                     "color": "#DA3434"
                 },
                 {
-                    "name": "Dockerfile",
-                    "color": "#384d54"
-                },
-                {
                     "name": "Python",
                     "color": "#3572A5"
+                },
+                {
+                    "name": "Dockerfile",
+                    "color": "#384d54"
                 }
             ],
             "edges": [
                 {
-                    "size": 2084647
+                    "size": 27438735
                 },
                 {
-                    "size": 55546
+                    "size": 2099656
                 },
                 {
-                    "size": 33009
+                    "size": 61869
+                },
+                {
+                    "size": 34475
+                },
+                {
+                    "size": 9313
                 },
                 {
                     "size": 5169
-                },
-                {
-                    "size": 4448
                 }
             ]
         }
