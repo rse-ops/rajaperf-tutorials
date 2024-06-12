@@ -1,1 +1,8 @@
-.ipynb_checkpoints
+*.pyc
+*.o
+*.exe
+*.swp
+*.swo
+build*/
+install*/
+*.ipynb_checkpoints
