@@ -45,13 +45,13 @@
             "totalCount": 69
         },
         "pullRequests_Merged": {
-            "totalCount": 283
+            "totalCount": 284
         },
         "issues_Open": {
-            "totalCount": 37
+            "totalCount": 36
         },
         "issues_Closed": {
-            "totalCount": 80
+            "totalCount": 81
         }
     }
 }
