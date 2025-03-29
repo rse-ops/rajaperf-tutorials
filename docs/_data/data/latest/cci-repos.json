@@ -26,7 +26,7 @@
             "totalCount": 50
         },
         "forks": {
-            "totalCount": 39
+            "totalCount": 40
         },
         "primaryLanguage": {
             "name": "Jupyter Notebook"
@@ -39,7 +39,7 @@
         },
         "parent": null,
         "pullRequests_Open": {
-            "totalCount": 18
+            "totalCount": 19
         },
         "pullRequests_Closed": {
             "totalCount": 71
