@@ -23,7 +23,7 @@
             "totalCount": 117
         },
         "mentionableUsers": {
-            "totalCount": 51
+            "totalCount": 52
         },
         "forks": {
             "totalCount": 41
@@ -39,19 +39,19 @@
         },
         "parent": null,
         "pullRequests_Open": {
-            "totalCount": 19
+            "totalCount": 17
         },
         "pullRequests_Closed": {
             "totalCount": 71
         },
         "pullRequests_Merged": {
-            "totalCount": 304
+            "totalCount": 308
         },
         "issues_Open": {
-            "totalCount": 46
+            "totalCount": 45
         },
         "issues_Closed": {
-            "totalCount": 83
+            "totalCount": 84
         }
     }
 }
