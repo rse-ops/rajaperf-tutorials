@@ -2,7 +2,7 @@
     "LLNL/RAJAPerf": {
         "languages": {
             "totalCount": 6,
-            "totalSize": 35149558,
+            "totalSize": 35149327,
             "nodes": [
                 {
                     "name": "Jupyter Notebook",
@@ -34,10 +34,10 @@
                     "size": 27438735
                 },
                 {
-                    "size": 7548502
+                    "size": 7548563
                 },
                 {
-                    "size": 103514
+                    "size": 103222
                 },
                 {
                     "size": 43412
