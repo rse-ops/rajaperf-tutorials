@@ -1,12 +1,12 @@
 {
-    "LLNL/RAJAPerf": {
-        "nameWithOwner": "LLNL/RAJAPerf",
+    "llnl/RAJAPerf": {
+        "nameWithOwner": "llnl/RAJAPerf",
         "name": "RAJAPerf",
         "owner": {
-            "login": "LLNL",
+            "login": "llnl",
             "avatarUrl": "https://avatars.githubusercontent.com/u/5921419?v=4"
         },
-        "url": "https://github.com/LLNL/RAJAPerf",
+        "url": "https://github.com/llnl/RAJAPerf",
         "homepageUrl": null,
         "description": "RAJA Performance Suite",
         "createdAt": "2017-09-25T20:18:46Z",
@@ -48,7 +48,7 @@
             "totalCount": 355
         },
         "issues_Open": {
-            "totalCount": 59
+            "totalCount": 60
         },
         "issues_Closed": {
             "totalCount": 89

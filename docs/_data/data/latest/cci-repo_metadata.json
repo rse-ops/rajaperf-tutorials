@@ -1,6 +1,6 @@
 {
-    "LLNL/RAJAPerf": {
-        "name": "LLNL/RAJAPerf",
+    "llnl/RAJAPerf": {
+        "name": "llnl/RAJAPerf",
         "description": "RAJA Performance Suite",
         "website": null,
         "topics": [
