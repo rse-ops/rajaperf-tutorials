@@ -1,0 +1,57 @@
+{
+    "llnl/RAJAPerf": {
+        "nameWithOwner": "llnl/RAJAPerf",
+        "name": "RAJAPerf",
+        "owner": {
+            "login": "llnl",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/5921419?v=4"
+        },
+        "url": "https://github.com/llnl/RAJAPerf",
+        "homepageUrl": null,
+        "description": "RAJA Performance Suite",
+        "createdAt": "2017-09-25T20:18:46Z",
+        "defaultBranchRef": {
+            "name": "develop"
+        },
+        "licenseInfo": {
+            "name": "BSD 3-Clause \"New\" or \"Revised\" License",
+            "nickname": "Modified BSD License",
+            "spdxId": "BSD-3-Clause",
+            "url": "http://choosealicense.com/licenses/bsd-3-clause/"
+        },
+        "stargazers": {
+            "totalCount": 127
+        },
+        "mentionableUsers": {
+            "totalCount": 56
+        },
+        "forks": {
+            "totalCount": 49
+        },
+        "primaryLanguage": {
+            "name": "Jupyter Notebook"
+        },
+        "languages": {
+            "totalCount": 6
+        },
+        "repositoryTopics": {
+            "totalCount": 7
+        },
+        "parent": null,
+        "pullRequests_Open": {
+            "totalCount": 25
+        },
+        "pullRequests_Closed": {
+            "totalCount": 77
+        },
+        "pullRequests_Merged": {
+            "totalCount": 359
+        },
+        "issues_Open": {
+            "totalCount": 60
+        },
+        "issues_Closed": {
+            "totalCount": 89
+        }
+    }
+}
