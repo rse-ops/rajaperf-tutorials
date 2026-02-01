@@ -1,0 +1,16 @@
+{
+    "llnl/RAJAPerf": {
+        "name": "llnl/RAJAPerf",
+        "description": "RAJA Performance Suite",
+        "website": null,
+        "topics": [
+            "c-plus-plus",
+            "cpp",
+            "programming-model",
+            "raja",
+            "llnl",
+            "proxy-application",
+            "performance"
+        ]
+    }
+}

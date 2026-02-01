@@ -1,0 +1,57 @@
+{
+    "llnl/RAJAPerf": {
+        "nameWithOwner": "llnl/RAJAPerf",
+        "name": "RAJAPerf",
+        "owner": {
+            "login": "llnl",
+            "avatarUrl": "https://avatars.githubusercontent.com/u/5921419?v=4"
+        },
+        "url": "https://github.com/llnl/RAJAPerf",
+        "homepageUrl": null,
+        "description": "RAJA Performance Suite",
+        "createdAt": "2017-09-25T20:18:46Z",
+        "defaultBranchRef": {
+            "name": "develop"
+        },
+        "licenseInfo": {
+            "name": "Other",
+            "nickname": null,
+            "spdxId": "NOASSERTION",
+            "url": "http://choosealicense.com/licenses/other/"
+        },
+        "stargazers": {
+            "totalCount": 130
+        },
+        "mentionableUsers": {
+            "totalCount": 57
+        },
+        "forks": {
+            "totalCount": 51
+        },
+        "primaryLanguage": {
+            "name": "Jupyter Notebook"
+        },
+        "languages": {
+            "totalCount": 6
+        },
+        "repositoryTopics": {
+            "totalCount": 7
+        },
+        "parent": null,
+        "pullRequests_Open": {
+            "totalCount": 24
+        },
+        "pullRequests_Closed": {
+            "totalCount": 79
+        },
+        "pullRequests_Merged": {
+            "totalCount": 384
+        },
+        "issues_Open": {
+            "totalCount": 63
+        },
+        "issues_Closed": {
+            "totalCount": 90
+        }
+    }
+}
