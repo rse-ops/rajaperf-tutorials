@@ -53,7 +53,7 @@ COPY --chown=$NB_USER:$NB_GID spack.yaml $HOME/spack_env/
 #install raja gcc and clang variants after conda init shell commands in an active bash session
 # then install raja-perf using spack dev-build
 RUN chmod +x scripts/add_spack_packages.sh && ./scripts/add_spack_packages.sh && \
-    chmod +x scripts/add_code_packages.sh && ./scripts/add_code_packages.sh
+    chmod +x scripts/add_code_packages_advance.sh && ./scripts/add_code_packages_advance.sh
 
 
 # Just some general notes about this Dockerfile before we call the entrypoint
